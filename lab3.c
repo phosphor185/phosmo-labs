@@ -1,18 +1,11 @@
 #include <stdio.h>
 
 int main() {
-    char str[81];
+    char str[80];
     int i = 0;
-    
-    // Ввод строки с консоли
-    printf("Введите строку (до 80 символов): ");
-        while (i < 80 && (ch = getchar()) != '\n' && ch != EOF) {
-        str[i] = ch;
-        i++;
-    }
-    str[i] = '\0';  // Добавляем завершающий нуль-символ
-    
-    // Замена 'a' на 'A' и 'b' на 'B'
+    char ch;
+    printf("vvedite stroku: ");
+    fgets(str, sizeof(str), stdin);
     for (i = 0; str[i] != '\0'; i++) {
         if (str[i] == 'a') {
             str[i] = 'A';
@@ -20,9 +13,7 @@ int main() {
             str[i] = 'B';
         }
     }
-    
-    // Вывод результата
-    printf("Результат: %s\n", str);
+    printf("res: %s", str);
     
     return 0;
 }
