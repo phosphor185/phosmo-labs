@@ -35,7 +35,6 @@ int onSegment(POINT p, POINT q, POINT r) {
 }
 
 // Проверка пересечения двух отрезков
-// p1q1 - первый отрезок, p2q2 - второй отрезок
 int doIntersect(POINT p1, POINT q1, POINT p2, POINT q2) {
     int o1 = orientation(p1, q1, p2);
     int o2 = orientation(p1, q1, q2);
@@ -47,8 +46,8 @@ int doIntersect(POINT p1, POINT q1, POINT p2, POINT q2) {
         return 1;
     
     // Специальные случаи (коллинеарность)
-    if (o1 == 0 && onSegment(p1, p2, q1)) return 1;    if (o2 == 0 && onSegment(p1, q2, q1)) return 1;
-    if (o3 == 0 && onSegment(p2, p1, q2)) return 1;
+    if (o1 == 0 && onSegment(p1, p2, q1)) return 1;
+    if (o2 == 0 && onSegment(p1, q2, q1)) return 1;    if (o3 == 0 && onSegment(p2, p1, q2)) return 1;
     if (o4 == 0 && onSegment(p2, q1, q2)) return 1;
     
     return 0;  // Не пересекаются
@@ -56,13 +55,21 @@ int doIntersect(POINT p1, POINT q1, POINT p2, POINT q2) {
 
 // Проверка самопересечения многоугольника
 int isSelfIntersecting(POLY *p) {
+    // Треугольник не может иметь самопересечений
+    if (p->n < 4)
+        return 0;
+    
     for (int i = 0; i < p->n; i++) {
         POINT a1 = p->p[i];
         POINT a2 = p->p[(i + 1) % p->n];
         
-        for (int j = 0; j < p->n; j++) {
+        for (int j = i + 2; j < p->n; j++) {
             // Пропускаем смежные отрезки
-            if (j == i || j == (i + 1) % p->n || (i == 0 && j == p->n - 1))
+            if (j == (i + 1) % p->n)
+                continue;
+            
+            // Для последнего отрезка пропускаем первый (они смежные)
+            if (i == 0 && j == p->n - 1)
                 continue;
                 
             POINT b1 = p->p[j];
@@ -89,14 +96,14 @@ double perimetr(POLY *p) {
 double area(POLY *p) {
     double s = 0;
     for (int i = 0; i < p->n; i++) {
-        int j = (i + 1) % p->n;
-        s += p->p[i].x * p->p[j].y - p->p[j].x * p->p[i].y;
+        int j = (i + 1) % p->n;        s += p->p[i].x * p->p[j].y - p->p[j].x * p->p[i].y;
     }
     return fabs(s) / 2.0;
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {        printf("Использование: %s <файл_с_координатами>\n", argv[0]);
+    if (argc < 2) {
+        printf("Использование: %s <файл_с_координатами>\n", argv[0]);
         return 1;
     }
     
@@ -138,8 +145,7 @@ int main(int argc, char *argv[]) {
         printf("ВНИМАНИЕ: Многоугольник имеет самопересечения!\n");
     } else {
         printf("Многоугольник простой (нет самопересечений)\n");
-        printf("Периметр: %.2f\n", perimetr(&p));
-        printf("Площадь: %.2f\n", area(&p));
+        printf("Периметр: %.2f\n", perimetr(&p));        printf("Площадь: %.2f\n", area(&p));
     }
     
     free(p.p);
