@@ -12,50 +12,41 @@ typedef struct {
     POINT *p;
 } POLY;
 
-// Расстояние между двумя точками
 double dist(POINT p1, POINT p2) {
     double dx = p2.x - p1.x;
     double dy = p2.y - p1.y;
     return sqrt(dx * dx + dy * dy);
 }
 
-// Ориентация трех точек
-// Возвращает: 0 - коллинеарны, 1 - по часовой, 2 - против часовой
 int orientation(POINT p, POINT q, POINT r) {
     double val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
     
-    if (fabs(val) < 1e-10) return 0;  // Коллинеарны
-    return (val > 0) ? 1 : 2;  // 1 - по часовой, 2 - против
+    if (fabs(val) < 1e-10) return 0; 
+    return (val > 0) ? 1 : 2; 
 }
 
-// Проверка принадлежности точки q отрезку pr
 int onSegment(POINT p, POINT q, POINT r) {
     return (q.x <= fmax(p.x, r.x) && q.x >= fmin(p.x, r.x) &&
             q.y <= fmax(p.y, r.y) && q.y >= fmin(p.y, r.y));
 }
-
-// Проверка пересечения двух отрезков
 int doIntersect(POINT p1, POINT q1, POINT p2, POINT q2) {
     int o1 = orientation(p1, q1, p2);
     int o2 = orientation(p1, q1, q2);
     int o3 = orientation(p2, q2, p1);
     int o4 = orientation(p2, q2, q1);
     
-    // Общий случай
+
     if (o1 != o2 && o3 != o4)
         return 1;
     
-    // Специальные случаи (коллинеарность)
     if (o1 == 0 && onSegment(p1, p2, q1)) return 1;
     if (o2 == 0 && onSegment(p1, q2, q1)) return 1;    if (o3 == 0 && onSegment(p2, p1, q2)) return 1;
     if (o4 == 0 && onSegment(p2, q1, q2)) return 1;
     
-    return 0;  // Не пересекаются
+    return 0; 
 }
 
-// Проверка самопересечения многоугольника
 int isSelfIntersecting(POLY *p) {
-    // Треугольник не может иметь самопересечений
     if (p->n < 4)
         return 0;
     
@@ -64,11 +55,10 @@ int isSelfIntersecting(POLY *p) {
         POINT a2 = p->p[(i + 1) % p->n];
         
         for (int j = i + 2; j < p->n; j++) {
-            // Пропускаем смежные отрезки
             if (j == (i + 1) % p->n)
                 continue;
             
-            // Для последнего отрезка пропускаем первый (они смежные)
+           
             if (i == 0 && j == p->n - 1)
                 continue;
                 
@@ -76,14 +66,12 @@ int isSelfIntersecting(POLY *p) {
             POINT b2 = p->p[(j + 1) % p->n];
             
             if (doIntersect(a1, a2, b1, b2)) {
-                return 1;  // Есть пересечение
+                return 1; 
             }
         }
     }
-    return 0;  // Нет пересечений
-}
+    return 0;  
 
-// Периметр многоугольника
 double perimetr(POLY *p) {
     double s = 0;
     for (int i = 0; i < p->n; i++) {
@@ -92,7 +80,6 @@ double perimetr(POLY *p) {
     return s;
 }
 
-// Площадь многоугольника (формула Гаусса)
 double area(POLY *p) {
     double s = 0;
     for (int i = 0; i < p->n; i++) {
@@ -140,7 +127,6 @@ int main(int argc, char *argv[]) {
     
     printf("Количество вершин: %d\n", p.n);
     
-    // Проверка на самопересечение
     if (isSelfIntersecting(&p)) {
         printf("ВНИМАНИЕ: Многоугольник имеет самопересечения!\n");
     } else {
