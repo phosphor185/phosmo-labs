@@ -29,25 +29,25 @@ int onSegment(POINT p, POINT q, POINT r) {
     return (q.x <= fmax(p.x, r.x) && q.x >= fmin(p.x, r.x) &&
             q.y <= fmax(p.y, r.y) && q.y >= fmin(p.y, r.y));
 }
+
 int doIntersect(POINT p1, POINT q1, POINT p2, POINT q2) {
     int o1 = orientation(p1, q1, p2);
     int o2 = orientation(p1, q1, q2);
     int o3 = orientation(p2, q2, p1);
     int o4 = orientation(p2, q2, q1);
     
-
     if (o1 != o2 && o3 != o4)
         return 1;
     
     if (o1 == 0 && onSegment(p1, p2, q1)) return 1;
-    if (o2 == 0 && onSegment(p1, q2, q1)) return 1;    if (o3 == 0 && onSegment(p2, p1, q2)) return 1;
+    if (o2 == 0 && onSegment(p1, q2, q1)) return 1;
+    if (o3 == 0 && onSegment(p2, p1, q2)) return 1;
     if (o4 == 0 && onSegment(p2, q1, q2)) return 1;
     
     return 0; 
 }
 
-int isSelfIntersecting(POLY *p) {
-    if (p->n < 4)
+int isSelfIntersecting(POLY *p) {    if (p->n < 4)
         return 0;
     
     for (int i = 0; i < p->n; i++) {
@@ -58,7 +58,6 @@ int isSelfIntersecting(POLY *p) {
             if (j == (i + 1) % p->n)
                 continue;
             
-           
             if (i == 0 && j == p->n - 1)
                 continue;
                 
@@ -70,7 +69,8 @@ int isSelfIntersecting(POLY *p) {
             }
         }
     }
-    return 0;  
+    return 0;
+}  // ← ВОТ ЭТОЙ СКОБКИ НЕ ХВАТАЛО!
 
 double perimetr(POLY *p) {
     double s = 0;
@@ -83,7 +83,8 @@ double perimetr(POLY *p) {
 double area(POLY *p) {
     double s = 0;
     for (int i = 0; i < p->n; i++) {
-        int j = (i + 1) % p->n;        s += p->p[i].x * p->p[j].y - p->p[j].x * p->p[i].y;
+        int j = (i + 1) % p->n;
+        s += p->p[i].x * p->p[j].y - p->p[j].x * p->p[i].y;
     }
     return fabs(s) / 2.0;
 }
@@ -95,8 +96,7 @@ int main(int argc, char *argv[]) {
     }
     
     FILE *f = fopen(argv[1], "r");
-    if (!f) {
-        printf("Ошибка: не удалось открыть файл %s\n", argv[1]);
+    if (!f) {        printf("Ошибка: не удалось открыть файл %s\n", argv[1]);
         return 1;
     }
     
@@ -131,7 +131,8 @@ int main(int argc, char *argv[]) {
         printf("ВНИМАНИЕ: Многоугольник имеет самопересечения!\n");
     } else {
         printf("Многоугольник простой (нет самопересечений)\n");
-        printf("Периметр: %.2f\n", perimetr(&p));        printf("Площадь: %.2f\n", area(&p));
+        printf("Периметр: %.2f\n", perimetr(&p));
+        printf("Площадь: %.2f\n", area(&p));
     }
     
     free(p.p);
