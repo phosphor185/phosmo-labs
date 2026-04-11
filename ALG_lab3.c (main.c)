@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+#define GETBIT(j) (b[(j)/8] & (0x80 >> ((j)%8)) ? 1 : 0)
+#define CLRBITS(j) (b[(j)/8] &= ~(0x80 >> ((j)%8)))
+
+
+int i;
+unsigned char b[10000000];
+unsigned long long *L;
+int main(int argc, char **argv)
+{
+    L = (unsigned long long *)b;
+    for ( i = 0; i<(10000000/8); i++) *L++=0xffffffffffffffffull;
+    CLRBITS(0);
+    CLRBITS(1);
+
+    for ( i = 0; i < 128; i++) {
+        printf("%d", GETBIT(i));
+    }
+    putchar('\n');
+
+    return 0;
+}
