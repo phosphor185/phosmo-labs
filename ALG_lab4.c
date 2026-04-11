@@ -88,3 +88,66 @@ int main() {
 
     return 0;
 }
+
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() {
+    char buf[1024];
+    printf("Vvedite translit: ");
+    fgets(buf, sizeof(buf), stdin);
+
+    int i = 0;
+    while (buf[i] != '\0') {
+        // Проверяем комбинации (жадный поиск: сначала длинные)
+        
+        // 3 буквы
+        if (strncmp(&buf[i], "sch", 3) == 0 || strncmp(&buf[i], "Sch", 3) == 0) {
+            printf("щ"); i += 3; continue;
+        }
+        
+        // 2 буквы
+        if (strncmp(&buf[i], "zh", 2) == 0 || strncmp(&buf[i], "Zh", 2) == 0) { printf("ж"); i += 2; continue; }
+        if (strncmp(&buf[i], "ch", 2) == 0 || strncmp(&buf[i], "Ch", 2) == 0) { printf("ч"); i += 2; continue; }
+        if (strncmp(&buf[i], "sh", 2) == 0 || strncmp(&buf[i], "Sh", 2) == 0) { printf("ш"); i += 2; continue; }
+        if (strncmp(&buf[i], "yo", 2) == 0 || strncmp(&buf[i], "Yo", 2) == 0) { printf("ё"); i += 2; continue; }
+        if (strncmp(&buf[i], "yu", 2) == 0 || strncmp(&buf[i], "Yu", 2) == 0) { printf("ю"); i += 2; continue; }
+        if (strncmp(&buf[i], "ya", 2) == 0 || strncmp(&buf[i], "Ya", 2) == 0) { printf("я"); i += 2; continue; }
+        if (strncmp(&buf[i], "kh", 2) == 0 || strncmp(&buf[i], "Kh", 2) == 0) { printf("х"); i += 2; continue; }
+        if (strncmp(&buf[i], "ts", 2) == 0 || strncmp(&buf[i], "Ts", 2) == 0) { printf("ц"); i += 2; continue; }
+
+        // 1 буква (строчные)
+        char c = buf[i];
+        switch (tolower(c)) {
+            case 'a': printf("а"); break;
+            case 'b': printf("б"); break;
+            case 'v': printf("в"); break;
+            case 'g': printf("г"); break;
+            case 'd': printf("д"); break;
+            case 'e': printf("е"); break;
+            case 'z': printf("з"); break;
+            case 'i': printf("и"); break;
+            case 'j': printf("й"); break; // или j->дж, но пусть будет й для простоты
+            case 'k': printf("к"); break;
+            case 'l': printf("л"); break;
+            case 'm': printf("м"); break;
+            case 'n': printf("н"); break;
+            case 'o': printf("о"); break;
+            case 'p': printf("п"); break;
+            case 'r': printf("р"); break;
+            case 's': printf("с"); break;
+            case 't': printf("т"); break;
+            case 'u': printf("у"); break;
+            case 'f': printf("ф"); break;
+            case 'h': printf("х"); break; // если не kh, то h->х (упрощение)
+            case 'y': printf("ы"); break; // упрощение: y->ы. (йо будет yo)
+            case '\'': printf("ь"); break;
+            case '"': printf("ъ"); break;
+            default: putchar(c); break; // Пробелы, знаки препинания
+        }
+        i++;
+    }
+    return 0;
+}
