@@ -7,9 +7,7 @@ typedef struct {
     const char *lat;
 } TranslitPair;
 
-// Полная таблица: строчные и заглавные буквы
 static const TranslitPair translit_table[] = {
-    // Строчные
     {"а", "a"}, {"б", "b"}, {"в", "v"}, {"г", "g"}, {"д", "d"},
     {"е", "e"}, {"ё", "yo"}, {"ж", "zh"}, {"з", "z"}, {"и", "i"},
     {"й", "y"}, {"к", "k"}, {"л", "l"}, {"м", "m"}, {"н", "n"},
@@ -17,7 +15,6 @@ static const TranslitPair translit_table[] = {
     {"у", "u"}, {"ф", "f"}, {"х", "kh"}, {"ц", "ts"}, {"ч", "ch"},
     {"ш", "sh"}, {"щ", "sch"}, {"ъ", "\""}, {"ы", "y"}, {"ь", "'"},
     {"э", "e"}, {"ю", "yu"}, {"я", "ya"},
-    // Заглавные
     {"А", "A"}, {"Б", "B"}, {"В", "V"}, {"Г", "G"}, {"Д", "D"},
     {"Е", "E"}, {"Ё", "Yo"}, {"Ж", "Zh"}, {"З", "Z"}, {"И", "I"},
     {"Й", "Y"}, {"К", "K"}, {"Л", "L"}, {"М", "M"}, {"Н", "N"},
@@ -38,7 +35,6 @@ int main() {
         return 1;
     }
 
-    // Убираем символ новой строки
     size_t len = strlen(input);
     if (len > 0 && input[len - 1] == '\n') {
         input[len - 1] = '\0';
@@ -55,7 +51,6 @@ int main() {
             output[out_pos++] = input[i];
             i++;
         } else if ((c & 0xE0) == 0xC0) {
-            // Двухбайтовый UTF-8 символ (русские буквы)
             char rus_char[3] = {input[i], input[i + 1], '\0'};
             int found = 0;
 
@@ -71,13 +66,11 @@ int main() {
             }
 
             if (!found) {
-                // Если не нашли в таблице, копируем как есть
                 output[out_pos++] = input[i];
                 output[out_pos++] = input[i + 1];
             }
             i += 2;
         } else {
-            // Другие многобайтовые символы или неверная кодировка
             output[out_pos++] = input[i];
             i++;
         }
@@ -101,14 +94,11 @@ int main() {
 
     int i = 0;
     while (buf[i] != '\0') {
-        // Проверяем комбинации (жадный поиск: сначала длинные)
         
-        // 3 буквы
         if (strncmp(&buf[i], "sch", 3) == 0 || strncmp(&buf[i], "Sch", 3) == 0) {
             printf("щ"); i += 3; continue;
         }
         
-        // 2 буквы
         if (strncmp(&buf[i], "zh", 2) == 0 || strncmp(&buf[i], "Zh", 2) == 0) { printf("ж"); i += 2; continue; }
         if (strncmp(&buf[i], "ch", 2) == 0 || strncmp(&buf[i], "Ch", 2) == 0) { printf("ч"); i += 2; continue; }
         if (strncmp(&buf[i], "sh", 2) == 0 || strncmp(&buf[i], "Sh", 2) == 0) { printf("ш"); i += 2; continue; }
@@ -118,7 +108,6 @@ int main() {
         if (strncmp(&buf[i], "kh", 2) == 0 || strncmp(&buf[i], "Kh", 2) == 0) { printf("х"); i += 2; continue; }
         if (strncmp(&buf[i], "ts", 2) == 0 || strncmp(&buf[i], "Ts", 2) == 0) { printf("ц"); i += 2; continue; }
 
-        // 1 буква (строчные)
         char c = buf[i];
         switch (tolower(c)) {
             case 'a': printf("а"); break;
@@ -129,7 +118,7 @@ int main() {
             case 'e': printf("е"); break;
             case 'z': printf("з"); break;
             case 'i': printf("и"); break;
-            case 'j': printf("й"); break; // или j->дж, но пусть будет й для простоты
+            case 'j': printf("й"); break; 
             case 'k': printf("к"); break;
             case 'l': printf("л"); break;
             case 'm': printf("м"); break;
@@ -141,11 +130,11 @@ int main() {
             case 't': printf("т"); break;
             case 'u': printf("у"); break;
             case 'f': printf("ф"); break;
-            case 'h': printf("х"); break; // если не kh, то h->х (упрощение)
-            case 'y': printf("ы"); break; // упрощение: y->ы. (йо будет yo)
+            case 'h': printf("х"); break; 
+            case 'y': printf("ы"); break; 
             case '\'': printf("ь"); break;
             case '"': printf("ъ"); break;
-            default: putchar(c); break; // Пробелы, знаки препинания
+            default: putchar(c); break; 
         }
         i++;
     }
