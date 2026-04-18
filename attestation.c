@@ -1,85 +1,9 @@
-#include <stdio.h>
-
-// Определение структуры, как в задании
-typedef struct segm {
-    double x1; double y1;
-    double x2; double y2;
-} SEGMENT;
-
-// Вспомогательная функция: косое произведение векторов (x1,y1) и (x2,y2)
-// Возвращает:
-// > 0 если поворот против часовой стрелки
-// < 0 если поворот по часовой стрелке
-// = 0 если точки лежат на одной прямой
-double cross_product(double x1, double y1, double x2, double y2) {
-    return x1 * y2 - x2 * y1;
-}
-
-// Функция проверки пересечения
-// Возвращает 1, если отрезки пересекаются, 0 иначе
 int segments_intersect(SEGMENT s1, SEGMENT s2) {
-    // Векторы для первого отрезка (s1)
-    double dx1 = s1.x2 - s1.x1;
-    double dy1 = s1.y2 - s1.y1;
-
-    // Векторы для второго отрезка (s2)
-    double dx2 = s2.x2 - s2.x1;
-    double dy2 = s2.y2 - s2.y1;
-
-    // Векторы от начала первого отрезка к началам/концам второго
-    double dx3 = s2.x1 - s1.x1;
-    double dy3 = s2.y1 - s1.y1;
-    
-    double dx4 = s2.x2 - s1.x1;
-    double dy4 = s2.y2 - s1.y1;
-
-    // Вычисляем ориентации
-    // cp1 и cp2 показывают, как s2 расположен относительно прямой s1
-    double cp1 = cross_product(dx1, dy1, dx3, dy3);
-    double cp2 = cross_product(dx1, dy1, dx4, dy4);
-
-    // cp3 и cp4 показывают, как s1 расположен относительно прямой s2
-    // Векторы от начала s2 к началам/концам s1
-    double dx5 = s1.x1 - s2.x1;
-    double dy5 = s1.y1 - s2.y1;
-    double cp3 = cross_product(dx2, dy2, dx5, dy5);
-    
-    double dx6 = s1.x2 - s2.x1;
-    double dy6 = s1.y2 - s2.y1;
-    double cp4 = cross_product(dx2, dy2, dx6, dy6);
-
-    // Основной случай: концы отрезков лежат по разные стороны от прямых, содержащих другие отрезки
-    if (((cp1 > 0 && cp2 < 0) || (cp1 < 0 && cp2 > 0)) &&
-        ((cp3 > 0 && cp4 < 0) || (cp3 < 0 && cp4 > 0))) {
-        return 1;
-    }
-
-    // Специальные случаи (коллинарность и касание)
-    // Если косое произведение равно 0, точки лежат на одной прямой.
-    // Здесь нужно проверить, лежит ли точка на самом отрезке (проверка координат).
-    // Для упрощения часто допускается возвращать 0, если нужно только строгое пересечение внутри,
-    // но для полного решения нужно проверять границы.
-    
-    if (cp1 == 0 && (s2.x1 >= (s1.x1 < s1.x2 ? s1.x1 : s1.x2) && s2.x1 <= (s1.x1 > s1.x2 ? s1.x1 : s1.x2)) &&
-                     (s2.y1 >= (s1.y1 < s1.y2 ? s1.y1 : s1.y2) && s2.y1 <= (s1.y1 > s1.y2 ? s1.y1 : s1.y2))) return 1;
-    if (cp2 == 0 && (s2.x2 >= (s1.x1 < s1.x2 ? s1.x1 : s1.x2) && s2.x2 <= (s1.x1 > s1.x2 ? s1.x1 : s1.x2)) &&
-                     (s2.y2 >= (s1.y1 < s1.y2 ? s1.y1 : s1.y2) && s2.y2 <= (s1.y1 > s1.y2 ? s1.y1 : s1.y2))) return 1;
-    if (cp3 == 0 && (s1.x1 >= (s2.x1 < s2.x2 ? s2.x1 : s2.x2) && s1.x1 <= (s2.x1 > s2.x2 ? s2.x1 : s2.x2)) &&
-                     (s1.y1 >= (s2.y1 < s2.y2 ? s2.y1 : s2.y2) && s1.y1 <= (s2.y1 > s2.y2 ? s2.y1 : s2.y2))) return 1;
-    if (cp4 == 0 && (s1.x2 >= (s2.x1 < s2.x2 ? s2.x1 : s2.x2) && s1.x2 <= (s2.x1 > s2.x2 ? s2.x1 : s2.x2)) &&
-                     (s1.y2 >= (s2.y1 < s2.y2 ? s2.y1 : s2.y2) && s1.y2 <= (s2.y1 > s2.y2 ? s2.y1 : s2.y2))) return 1;
-
-    return 0;
-}
-
-int main() {
-    SEGMENT s1 = {0, 0, 10, 10};
-    SEGMENT s2 = {0, 10, 10, 0};
-
-    if (segments_intersect(s1, s2)) {
-        printf("Отрезки пересекаются.\n");
-    } else {
-        printf("Отрезки не пересекаются.\n");
-    }
-    return 0;
+    #define CP(x1,y1,x2,y2) ((x1)*(y2)-(x2)*(y1))
+    double a1 = CP(s1.x2-s1.x1, s1.y2-s1.y1, s2.x1-s1.x1, s2.y1-s1.y1);
+    double a2 = CP(s1.x2-s1.x1, s1.y2-s1.y1, s2.x2-s1.x1, s2.y2-s1.y1);
+    double a3 = CP(s2.x2-s2.x1, s2.y2-s2.y1, s1.x1-s2.x1, s1.y1-s2.y1);
+    double a4 = CP(s2.x2-s2.x1, s2.y2-s2.y1, s1.x2-s2.x1, s1.y2-s2.y1);
+    #undef CP
+    return (a1*a2 < 0) && (a3*a4 < 0);
 }
