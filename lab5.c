@@ -1,47 +1,75 @@
 ЗАГОЛОВОК func.h
-#ifndef FUNC_H
-#define FUNC_H
-double** calculate(double** A, double** B, int n, char op);
-
-#endif
+Создать функцию выделения памяти под матрицу, функция освобождения памяти для матрицы, создать функцию функции сложения вычитания и деления, умножения
 
 ФУНКЦИЯ func.c
 #include <stdlib.h>
 #include "func.h"
 
-
-double** calculate(double** A, double** B, int n, char op) {
-    int i, j, k;
-    double** Res = (double**)malloc(n * sizeof(double*));
-    for (i = 0; i < n; i++) {
-        Res[i] = (double*)malloc(n * sizeof(double));
+// 1. Выделение памяти под матрицу n x n
+double** create_matrix(int n) {
+    double** mat = (double**)malloc(n * sizeof(double*));
+    for (int i = 0; i < n; i++) {
+        mat[i] = (double*)malloc(n * sizeof(double));
     }
+    return mat;
+}
 
-    if (op == '+') {
-        for ( i = 0; i < n; i++) {
-            for ( j = 0; j < n; j++) {
-                Res[i][j] = A[i][j] + B[i][j];
-            }
-        }
-    } 
-    else if (op == '-') {
-        for ( i = 0; i < n; i++) {
-            for ( j = 0; j < n; j++) {
-                Res[i][j] = A[i][j] - B[i][j];
-            }
-        }
-    } 
-    else if (op == '*') {
-        for (i = 0; i < n; i++) {
-            for (j = 0; j < n; j++) {
-                Res[i][j] = 0; 
-                for (k = 0; k < n; k++) {
-                    Res[i][j] += A[i][k] * B[k][j];
-                }
-            }
+// 2. Освобождение памяти
+void free_matrix(double** mat, int n) {
+    for (int i = 0; i < n; i++) {
+        free(mat[i]); // сначала ряды
+    }
+    free(mat);        // потом сам массив указателей
+}
+
+// 3. Сложение
+double** add_matrices(double** A, double** B, int n) {
+    double** Res = create_matrix(n); // сразу создаем готовую матрицу
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            Res[i][j] = A[i][j] + B[i][j];
         }
     }
+    return Res;
+}
 
+// 4. Вычитание
+double** sub_matrices(double** A, double** B, int n) {
+    double** Res = create_matrix(n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            Res[i][j] = A[i][j] - B[i][j];
+        }
+    }
+    return Res;
+}
+
+// 5. Умножение (матричное)
+double** mul_matrices(double** A, double** B, int n) {
+    double** Res = create_matrix(n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            Res[i][j] = 0;
+            for (int k = 0; k < n; k++) {
+                Res[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    return Res;
+}
+
+// 6. Деление (поэлементное, как обычно требуют на 1-2 курсе)
+double** div_matrices(double** A, double** B, int n) {
+    double** Res = create_matrix(n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (B[i][j] != 0) {
+                Res[i][j] = A[i][j] / B[i][j];
+            } else {
+                Res[i][j] = 0; // защита от краша при делении на 0
+            }
+        }
+    }
     return Res;
 }
 
@@ -50,60 +78,68 @@ double** calculate(double** A, double** B, int n, char op) {
 #include <stdlib.h>
 #include "func.h"
 
-int main() {
+// Отдельная функция для ввода, чтобы main был чистым
+void input_matrix(double** mat, int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%lf", &mat[i][j]);
+        }
+    }
+}
 
-    int n,i,j,k;
+int main() {
+    setlocale(LC_ALL, "Russian");
+    int n;
     char op;
 
     printf("Vvedite razmer matricy n: ");
     scanf("%d", &n);
 
-    double** A = (double**)malloc(n * sizeof(double*));
-    for (i = 0; i < n; i++) {
-        A[i] = (double*)malloc(n * sizeof(double));
+    // Выделяем память через нашу функцию
+    double** A = create_matrix(n);
+    double** B = create_matrix(n);
+
+    printf("Vvedite matricu A:\n");
+    input_matrix(A, n);
+
+    printf("Vvedite matricu B:\n");
+    input_matrix(B, n);
+
+    printf("Vvedite operaciyu (+, -, *, /): ");
+    scanf(" %c", &op); // пробел перед %c съедает лишний Enter
+
+    double** Result = NULL;
+
+    // Препод просил отдельные функции, поэтому делаем выбор тут
+    if (op == '+') {
+        Result = add_matrices(A, B, n);
+    } else if (op == '-') {
+        Result = sub_matrices(A, B, n);
+    } else if (op == '*') {
+        Result = mul_matrices(A, B, n);
+    } else if (op == '/') {
+        Result = div_matrices(A, B, n);
+    } else {
+        printf("Neizvestnaya operaciya!\n");
+        free_matrix(A, n);
+        free_matrix(B, n);
+        return 1;
     }
 
-    double** B = (double**)malloc(n * sizeof(double*));
-    for (i = 0; i < n; i++) {
-        B[i] = (double*)malloc(n * sizeof(double));
-    }
-
-    printf("Vvedite elementy matricy A:\n");
-    for (i = 0; i < n; i++) {
-        for ( j = 0; j < n; j++) {
-            scanf("%lf", &A[i][j]);
-        }
-    }
-
-    printf("Vvedite elementy matricy B:\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            scanf("%lf", &B[i][j]);
-        }
-    }
-
-    printf("Vvedite operaciyu (+, -, *): ");
-    scanf(" %c", &op); 
-
-    double** Result = calculate(A, B, n, op);
-
+    // Вывод
     printf("Result:\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             printf("%.2lf ", Result[i][j]);
         }
         printf("\n");
     }
 
-    for( i=0; i<n; i++) {
-        free(A[i]);
-        free(B[i]);
-        free(Result[i]);
-    }
-    free(A);
-    free(B);
-    free(Result);
+    // Чистим память ВСЕХ матриц
+    free_matrix(A, n);
+    free_matrix(B, n);
+    free_matrix(Result, n);
 
-    system("pause"); 
+    system("pause");
     return 0;
 }
