@@ -1,5 +1,19 @@
 ЗАГОЛОВОК func.h
 Создать функцию выделения памяти под матрицу, функция освобождения памяти для матрицы, создать функцию функции сложения вычитания и деления, умножения
+#ifndef FUNC_H
+#define FUNC_H
+
+// Память
+double** create_matrix(int n);
+void free_matrix(double** mat, int n);
+
+// Операции (каждая своя функция)
+double** add_matrices(double** A, double** B, int n);
+double** sub_matrices(double** A, double** B, int n);
+double** mul_matrices(double** A, double** B, int n);
+double** div_matrices(double** A, double** B, int n);
+
+#endif
 
 ФУНКЦИЯ func.c
 #include <stdlib.h>
